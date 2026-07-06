@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방학 공부 달력 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#f5f5f3;--bg3:#efefed;
+  --text:#1a1a18;--text2:#6b6a65;--text3:#9b9a94;
+  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
+  --radius:8px;--radius-lg:12px;
+  --green:#1d9e75;--orange:#ba7517;--red:#d4537e;
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#1a1a18;--bg2:#242422;--bg3:#2e2e2b;--text:#e8e6df;--text2:#9b9a94;--text3:#6b6a65;--border:rgba(255,255,255,0.12);--border2:rgba(255,255,255,0.22)}
+  .t-linux{background:#1a3a0a!important;color:#a0cc70!important}
+  .t-web{background:#0a2a4a!important;color:#80b4e8!important}
+  .t-hack{background:#0a3020!important;color:#70c8a0!important}
+  .t-algo{background:#3a2000!important;color:#e8a840!important}
+  .t-rest{background:#2a2a28!important;color:#9b9a94!important}
+  .t-review{background:#2a0a18!important;color:#d880a0!important}
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+.app{max-width:720px;margin:0 auto}
+h1{font-size:18px;font-weight:500;margin-bottom:4px}
+.subtitle{font-size:12px;color:var(--text3);margin-bottom:14px}
+.sync-status{font-size:11px;padding:4px 10px;border-radius:99px;display:inline-block;margin-bottom:12px}
+.sync-ok{background:#e1f5ee;color:#085041}
+.sync-saving{background:#faeeda;color:#633806}
+.sync-err{background:#fbeaf0;color:#72243e}
+.nav{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.nav-btn{background:none;border:0.5px solid var(--border2);border-radius:var(--radius);padding:5px 14px;cursor:pointer;font-size:13px;color:var(--text)}
+.nav-btn:hover{background:var(--bg2)}
+.month-title{font-size:16px;font-weight:500;flex:1;text-align:center}
+.legend{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.ld{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dh-row{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
+.dh{font-size:11px;color:var(--text3);text-align:center;padding:4px 0}
+.dh.sun{color:#e24b4a}.dh.sat{color:#185fa5}
+.wgrid{display:flex;flex-direction:column;gap:2px}
+.wrow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.dc{border-radius:6px;padding:5px 6px;min-height:82px;border:0.5px solid var(--border);background:var(--bg);cursor:pointer;transition:border-color .15s;position:relative}
+.dc:hover{border-color:var(--border2)}
+.dc.empty{background:transparent;border-color:transparent;cursor:default;min-height:0}
+.dc.today{border-color:var(--text)!important;border-width:1.5px!important}
+.dc.noplan{background:var(--bg2);cursor:default}
+.dc.doubled{border-color:var(--orange)!important}
+.dn{font-size:11px;color:var(--text3);margin-bottom:3px}
+.dn.sun{color:#e24b4a}.dn.sat{color:#185fa5}.dn.td{color:var(--text);font-weight:600}
+.tag{font-size:9px;padding:2px 5px;border-radius:99px;margin-bottom:2px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.t-linux{background:#eaf3de;color:#27500a}
+.t-web{background:#e6f1fb;color:#0c447c}
+.t-hack{background:#e1f5ee;color:#085041}
+.t-algo{background:#faeeda;color:#633806}
+.t-rest{background:#f1efe8;color:#5f5e5a}
+.t-review{background:#fbeaf0;color:#72243e}
+.double-badge{position:absolute;top:4px;right:4px;font-size:8px;padding:1px 4px;border-radius:99px;background:#faeeda;color:#633806;line-height:1.4;font-weight:500}
+.progress-bar{height:3px;border-radius:99px;background:var(--bg3);margin-top:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;background:var(--green);transition:width .3s}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:center;justify-content:center;padding:12px}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg);border-radius:var(--radius-lg);padding:20px;max-width:400px;width:100%;border:0.5px solid var(--border2);max-height:90vh;overflow-y:auto}
+.m-meta{font-size:11px;color:var(--text3);margin-bottom:2px}
+.m-title{font-size:15px;font-weight:500;margin-bottom:3px;line-height:1.4}
+.m-path{font-size:11px;color:var(--text2);margin-bottom:12px}
+.sec-label{font-size:10px;color:var(--text3);letter-spacing:.05em;margin-bottom:6px;margin-top:14px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.sec-progress{font-size:10px;color:var(--green);margin-left:auto}
+.cl-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:var(--radius);border:0.5px solid var(--border);margin-bottom:4px;background:var(--bg);transition:opacity .15s}
+.cl-item.done{opacity:.5}
+.cl-item.done .cl-text{text-decoration:line-through;color:var(--text3)}
+.cl-item.moved-away{opacity:.35;border-style:dashed}
+.cl-item.incoming{border-color:var(--green);background:#f0faf6}
+.cl-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s;margin-top:1px}
+.cl-check.checked{background:var(--green);border-color:var(--green);color:#fff}
+.cl-text{font-size:12px;line-height:1.5;flex:1;color:var(--text)}
+.cl-actions{display:flex;gap:3px;flex-shrink:0}
+.cl-btn{background:none;border:0.5px solid var(--border2);border-radius:5px;padding:2px 6px;cursor:pointer;font-size:10px;color:var(--text2);transition:background .1s;white-space:nowrap}
+.cl-btn:hover{background:var(--bg2)}
+.cl-btn.push{color:var(--orange)}
+.cl-btn.pull{color:var(--green)}
+.cl-btn.restore{color:var(--text3)}
+.incoming-label{font-size:9px;color:var(--green);margin-bottom:2px}
+.divider{height:0.5px;background:var(--border);margin:14px 0}
+.btn-row{display:flex;gap:8px;margin-top:16px}
+.m-close{flex:1;padding:9px;border:0.5px solid var(--border2);border-radius:var(--radius);background:none;cursor:pointer;font-size:13px;color:var(--text)}
+.m-close:hover{background:var(--bg2)}
+.double-btn{flex:1;padding:9px;border:none;border-radius:var(--radius);background:var(--orange);color:#fff;cursor:pointer;font-size:13px;font-weight:500}
+.double-btn:hover{opacity:.88}
+.pull-panel{display:none;margin-top:12px;border-top:0.5px solid var(--border);padding-top:12px}
+.pull-panel.open{display:block}
+.pull-question{font-size:13px;font-weight:500;margin-bottom:10px;line-height:1.5}
+.pull-opts{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.pull-opt{padding:10px 12px;border-radius:var(--radius);border:0.5px solid var(--border2);cursor:pointer;font-size:12px;line-height:1.5;background:var(--bg);text-align:left;color:var(--text)}
+.pull-opt:hover{background:var(--bg2)}
+.pull-opt.selected{border-color:var(--orange);background:#faeeda;color:#633806}
+.pull-confirm{width:100%;padding:9px;border:none;border-radius:var(--radius);background:var(--orange);color:#fff;cursor:pointer;font-size:13px;font-weight:500}
+.pull-confirm:hover{opacity:.88}
+.pull-confirm:disabled{opacity:.4;cursor:default}
+.footer{margin-top:16px;font-size:11px;color:var(--text3);text-align:center}
+@media(prefers-color-scheme:dark){.cl-item.incoming{background:#0a2a1a!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>방학 공부 달력 — 2026</h1>
+<div class="subtitle">날짜 클릭 → 체크리스트 · 항목별 밀기/당기기</div>
+<div id="sync-status" class="sync-status sync-ok">☁ 연결 중...</div>
+<div class="nav">
+  <button class="nav-btn" onclick="prev()">←</button>
+  <div class="month-title" id="mtitle"></div>
+  <button class="nav-btn" onclick="next()">→</button>
+</div>
+<div class="legend">
+  <div class="li"><div class="ld" style="background:#3b6d11"></div>Linux</div>
+  <div class="li"><div class="ld" style="background:#185fa5"></div>웹 서비스</div>
+  <div class="li"><div class="ld" style="background:#1d9e75"></div>웹해킹</div>
+  <div class="li"><div class="ld" style="background:#ba7517"></div>알고리즘</div>
+  <div class="li"><div class="ld" style="background:#d4537e"></div>복습</div>
+  <div class="li"><div class="ld" style="background:#888780"></div>휴식</div>
+</div>
+<div class="dh-row">
+  <div class="dh sun">일</div><div class="dh">월</div><div class="dh">화</div>
+  <div class="dh">수</div><div class="dh">목</div><div class="dh">금</div><div class="dh sat">토</div>
+</div>
+<div class="wgrid" id="grid"></div>
+<div class="footer">✓ 체크 · → 내일로 밀기 · ← 오늘로 당기기</div>
+</div>
+
+<div class="modal-bg" id="mbg" onclick="closeIf(event)">
+<div class="modal">
+  <div class="m-meta" id="m-meta"></div>
+  <div class="m-title" id="m-title"></div>
+  <div class="m-path" id="m-path"></div>
+  <div id="m-body"></div>
+  <div class="btn-row" id="m-btns"></div>
+  <div class="pull-panel" id="pull-panel">
+    <div class="pull-question">휴식일도 같이 당길까요?</div>
+    <div class="pull-opts">
+      <div class="pull-opt" id="opt-include" onclick="selectRestOpt('include')">
+        <strong>휴식일 포함</strong><br>
+        <span style="font-size:11px;color:var(--text2)">이후 날짜가 통째로 하루 앞당겨짐</span>
+      </div>
+      <div class="pull-opt" id="opt-skip" onclick="selectRestOpt('skip')">
+        <strong>휴식일 고정, 학습일만 당기기</strong><br>
+        <span style="font-size:11px;color:var(--text2)">일요일·토요일은 그대로 유지</span>
+      </div>
+    </div>
+    <button class="pull-confirm" id="pull-confirm" disabled onclick="confirmDayPull()">⚡ 당기기 적용</button>
+  </div>
+</div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAjJm7WdM2BbfFRvuoKKw3qFkLsdf0wfbw",
+  authDomain: "dreamhack-calendar.firebaseapp.com",
+  projectId: "dreamhack-calendar",
+  storageBucket: "dreamhack-calendar.firebasestorage.app",
+  messagingSenderId: "267583766579",
+  appId: "1:267583766579:web:798a8c6e55743c6b336346"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const STATE_DOC = doc(db, "calendar", "state");
+
+// ── 상태 ──────────────────────────────────────────────────────
+window.checked = {};
+window.moved = {};
+window.doubles = {};
+window.restOpts = {};
+let saveTimer = null;
+
+function setSyncStatus(s){
+  const el=document.getElementById('sync-status');
+  if(s==='ok'){el.textContent='☁ 동기화됨';el.className='sync-status sync-ok';}
+  else if(s==='saving'){el.textContent='☁ 저장 중...';el.className='sync-status sync-saving';}
+  else{el.textContent='☁ 오프라인 (로컬 저장)';el.className='sync-status sync-err';}
+}
+
+// Firestore 실시간 동기화
+onSnapshot(STATE_DOC, (snap) => {
+  if(snap.exists()){
+    const d=snap.data();
+    window.checked=d.checked||{};
+    window.moved=d.moved||{};
+    window.doubles=d.doubles||{};
+    window.restOpts=d.restOpts||{};
+  }
+  setSyncStatus('ok');
+  if(typeof render==='function') render(window.cY,window.cM);
+}, (err)=>{
+  console.error(err);
+  setSyncStatus('err');
+  // 오프라인이면 localStorage fallback
+  try{
+    window.checked=JSON.parse(localStorage.getItem('dh_checked')||'{}');
+    window.moved=JSON.parse(localStorage.getItem('dh_moved')||'{}');
+    window.doubles=JSON.parse(localStorage.getItem('dh_doubles')||'{}');
+    window.restOpts=JSON.parse(localStorage.getItem('dh_restopts')||'{}');
+  }catch(e){}
+  if(typeof render==='function') render(window.cY,window.cM);
+});
+
+// 저장 (debounce 1초)
+window.saveAll = function(){
+  setSyncStatus('saving');
+  // localStorage fallback
+  try{
+    localStorage.setItem('dh_checked',JSON.stringify(window.checked));
+    localStorage.setItem('dh_moved',JSON.stringify(window.moved));
+    localStorage.setItem('dh_doubles',JSON.stringify(window.doubles));
+    localStorage.setItem('dh_restopts',JSON.stringify(window.restOpts));
+  }catch(e){}
+  // Firestore 저장 (1초 debounce)
+  if(saveTimer) clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    try{
+      await setDoc(STATE_DOC,{
+        checked:window.checked,
+        moved:window.moved,
+        doubles:window.doubles,
+        restOpts:window.restOpts,
+        updatedAt:new Date().toISOString()
+      });
+      setSyncStatus('ok');
+    }catch(e){
+      console.error(e);
+      setSyncStatus('err');
+    }
+  },1000);
+};
+</script>
+
+<script>
+const TODAY=new Date();
+const S=new Date(2026,5,20);
+const E=new Date(2026,7,31);
+
+const PLAN=[
+{path:"Dream Beginners",type:"hack",title:"Introduction to Dreamhack",hack:["Introduction to Dreamhack 강의 정독","학습/워게임/CTF 탭 탐색","Wargame Tutorial 풀기"],algo:["Programmers Lv.0 — 두 수의 합","Lv.0 — 두 수의 차"]},
+{type:"review",title:"1일차 복습",items:["드림핵 플랫폼 구조 다시 정리","Wargame Tutorial 재확인","Lv.0 틀린 문제 재풀이"]},
+{type:"rest"},
+{path:"Dream Beginners",type:"hack",title:"컴퓨터 과학 기초",hack:["컴퓨터 과학 기초 강의 정독","비트/바이트/진법 변환 정리","64se64 워게임 도전"],algo:["Lv.0 — 나머지 구하기","Lv.0 — 중앙값 구하기"]},
+{path:"Dream Beginners",type:"linux",title:"리눅스 환경 구축하기",hack:["리눅스 환경 구축하기 강의","본인 환경에 맞게 Linux 설치","터미널 열어서 ls, pwd, cd 확인"],algo:["Lv.0 — 최빈값 구하기","Lv.0 — 짝수는 싫어요"]},
+{path:"Dream Beginners",type:"linux",title:"리눅스 사용법 + 해킹 팁",hack:["리눅스 사용법 한 눈에 살펴보기 강의","baby-linux 워게임 도전","Netcat / SSH 강의 정독"],algo:["Lv.0 — 배열 두 배 만들기","Lv.0 — 문자열 뒤집기"]},
+{path:"Dream Beginners",type:"linux",title:"해킹 팁 실습 + 카테고리 소개",hack:["Exercise: Welcome-Beginners (nc 실습)","Exercise: SSH 실습","드림핵 주요 카테고리 소개 강의"],algo:["Lv.0 — 소인수분해","Lv.0 자유 2문제"]},
+{path:"Dream Beginners",type:"linux",title:"Docker + 정규표현식",hack:["Docker 강의 정독","Exercise: Docker 실습","정규 표현식 강의 정독"],algo:["Lv.0 마무리 자유 2문제"]},
+{type:"review",title:"1주차 복습",items:["Dream Beginners 전체 흐름 정리","baby-linux / Welcome-Beginners 재풀이","Lv.0 틀린 문제 재풀이"]},
+{type:"rest"},
+{path:"Linux 101",type:"linux",title:"리눅스 셸 + 파일/디렉토리",hack:["리눅스 셸 강의 (sh/bash/dash/zsh)","파일과 디렉토리 강의 정독","Lab: Linux-File / Directory 맛보기"],algo:["Lv.0 마무리 + Lv.1 시작 — 문자열"]},
+{path:"Linux 101",type:"linux",title:"프로세스 + 환경 변수",hack:["프로세스 생성 및 관리 강의","Lab: Linux-Process 맛보기","리눅스 환경 변수 강의"],algo:["Lv.1 — 문자열 내 p와 y의 개수","Lv.1 — 두 개 뽑아서 더하기"]},
+{path:"Linux 101",type:"linux",title:"파일 디스크립터 + 사용자/그룹",hack:["파일 디스크립터 강의 (pipe, redirection)","Lab: Linux-File Descriptor 맛보기","사용자와 그룹 강의"],algo:["Lv.1 — 소수 만들기","Lv.1 — 모의고사"]},
+{path:"Linux 201",type:"linux",title:"APT + 네트워크 + Vim",hack:["APT 패키지 관리 강의","리눅스 네트워크 관리 강의 + Lab","Vim 강의 — 기본 편집 실습"],algo:["Lv.1 — 체육복","Lv.1 — 완주하지 못한 선수"]},
+{path:"Linux 101/201",type:"linux",title:"리눅스 전체 복습",hack:["주요 명령어 치트시트 직접 작성","파일/프로세스/네트워크 명령어 터미널 실행","못 풀었던 Lab 맛보기 재시도"],algo:["Lv.1 자유 2문제"]},
+{type:"review",title:"2주차 복습",items:["리눅스 명령어 20개 손으로 써보기","Vim으로 파일 만들고 편집하기","Lv.1 틀린 문제 재풀이"]},
+{type:"rest"},
+{path:"Building a Web Service",type:"web",title:"웹 기초 1 — Web/HTTP",hack:["Background: Web 강의 1/2 정독","Background: HTTP/HTTPS 강의","Quiz: Web / HTTP/HTTPS 풀기"],algo:["Lv.1 — 크레인 인형뽑기","Lv.1 — 폰켓몬"]},
+{path:"Building a Web Service",type:"web",title:"웹 기초 2 — 브라우저",hack:["Background: Web Browser 강의","Tools: Browser DevTools 강의","devtools-sources 워게임 풀기"],algo:["Lv.1 — 신고 결과 받기","Lv.1 — K번째 수"]},
+{path:"Building a Web Service",type:"web",title:"Cookie & Session",hack:["Background: Cookie & Session 강의","Quiz: Cookie & Session","cookie 워게임 풀기"],algo:["Lv.1 — 가장 큰 수","Lv.1 자유 1문제"]},
+{path:"Building a Web Service",type:"web",title:"Session + SOP",hack:["session-basic 워게임 풀기","Mitigation: Same Origin Policy 강의","Quiz: Same Origin Policy"],algo:["Lv.1 — 조이스틱","Lv.1 자유 1문제"]},
+{path:"Building a Web Service",type:"web",title:"HTML + Flask 기초",hack:["배경지식: HTML 강의 정독","배경지식: Flask 강의 정독","Flask Hello World 서버 직접 만들기"],algo:["Lv.1 자유 2문제"]},
+{type:"review",title:"3주차 복습",items:["HTTP 요청/응답 직접 curl로 날려보기","session-basic / devtools-sources 재풀이","Lv.1 틀린 문제 재풀이"]},
+{type:"rest"},
+{path:"Building a Web Service",type:"web",title:"게시판 서비스 구축 1",hack:["배경지식: 데이터베이스 강의","실습: 로그인 기능 구현하기","Flask + SQLite로 로그인 폼 직접 코딩"],algo:["Lv.1 자유 2문제"]},
+{path:"Building a Web Service",type:"web",title:"게시판 서비스 구축 2",hack:["실습: 깔끔한 코드 패턴 만들기","실습: 게시판 기능 구현하기","완성된 게시판 서버 실행 + 동작 확인"],algo:["Lv.1 자유 2문제"]},
+{path:"Building a Web Service",type:"web",title:"웹 서비스 복습 + 해킹 준비",hack:["완성한 Flask 게시판 코드 전체 리뷰","취약점 생길 수 있는 곳 직접 찾아보기","ClientSide: XSS 강의 예습"],algo:["Lv.2 — 모음사전"]},
+{path:"Web Hacking Basics",type:"hack",title:"XSS 1 — 개념",hack:["ClientSide: XSS 강의 정독","Reflected / Stored / DOM XSS 차이 정리","Quiz: XSS 풀기"],algo:["Lv.2 — 소수 찾기"]},
+{path:"Web Hacking Basics",type:"hack",title:"XSS 2 — 실습",hack:["Exercise: XSS 풀기","xss-1 워게임 도전","다양한 alert() 페이로드 직접 테스트"],algo:["Lv.2 — 피로도"]},
+{type:"review",title:"4주차 복습",items:["XSS 3종류 직접 설명해보기","xss-1 풀이 재현 (보지 않고)","Lv.2 틀린 문제 재풀이"]},
+{type:"rest"},
+{path:"Web Hacking Basics",type:"hack",title:"XSS 3 — xss-2 도전",hack:["xss-2 워게임 도전","막히면 30분 후 writeup 분석 → 직접 재현","XSS 필터 우회 페이로드 정리"],algo:["Lv.2 — 캐릭터 뽑기"]},
+{path:"Deep Dive",type:"hack",title:"XSS Filtering Bypass 1",hack:["Exploit Tech: XSS Filtering Bypass - I 강의","Quiz: XSS Filtering Bypass - I","String Substitution 우회 기법 정리"],algo:["Lv.2 — 타겟 넘버"]},
+{path:"Deep Dive",type:"hack",title:"XSS Filtering Bypass 2",hack:["Exploit Tech: XSS Filtering Bypass - II 강의","Quiz: XSS Filtering Bypass - II","Javascript Keyword 필터 우회 기법 정리"],algo:["Lv.2 — 게임 맵 최단거리"]},
+{path:"Deep Dive",type:"hack",title:"XSS Filtering Bypass 실습",hack:["Exercise: XSS Filtering Bypass 풀기","XSS Filtering Bypass 워게임 도전","XSS Filtering Bypass Advanced 워게임 도전"],algo:["Lv.2 — 네트워크"]},
+{path:"Deep Dive",type:"hack",title:"XSS 전체 정리",hack:["xss-1, xss-2, XSS Filtering Bypass 풀이 노트 정리","XSS 페이로드 개인 치트시트 완성","못 푼 문제 writeup 분석"],algo:["Lv.2 자유 1문제"]},
+{type:"review",title:"5주차 복습",items:["XSS + Filtering Bypass 전체 흐름 정리","XSS Filtering Bypass Advanced 재도전","Lv.2 틀린 문제 재풀이"]},
+{type:"rest"},
+{type:"rest",title:"Starter 구매 검토일",items:["진도 체크 후 Starter 구매 고려"]},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"CSRF — 개념",hack:["ClientSide: CSRF 강의 정독","XSS vs CSRF 차이 정리","Quiz: CSRF"],algo:["Lv.2 — 단어 변환"]},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"CSRF — 실습",hack:["Exercise: CSRF 풀기","csrf-1 워게임 도전","SameSite 쿠키 속성 분석"],algo:["Lv.2 자유 2문제"]},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"CSRF-2 + SSRF 개념",hack:["Exercise: CSRF-2 풀기","csrf-2 워게임 도전","ServerSide: SSRF 강의 정독"],algo:["Lv.2 — 기능개발"]},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"SSRF 실습",hack:["Quiz: SSRF","Exercise: SSRF 풀기","web-ssrf 워게임 도전"],algo:["Lv.2 — 프린터"]},
+{type:"review",title:"6주차 복습",items:["CSRF 공격 흐름 직접 그려보기","web-ssrf 풀이 재확인","Lv.2 틀린 문제 재풀이"]},
+{type:"rest"},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"Command Injection — 개념",hack:["ServerSide: Command Injection 강의","OS 커맨드 구분자 (;|&&||) 정리","Quiz: Command Injection"],algo:["Lv.2 자유 2문제"]},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"Command Injection — 실습",hack:["Exercise: Command Injection 풀기","command-injection-1 워게임 도전","커맨드 인젝션 페이로드 치트시트"],algo:["Lv.2 자유 2문제"]},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"File Vulnerability — 개념",hack:["ServerSide: File Vulnerability 강의","파일 업로드/다운로드 취약점 차이 정리","Quiz: File Vulnerability"],algo:["Lv.2 자유 2문제"]},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"File Vulnerability — 실습",hack:["Exercise: File Vulnerability 풀기","image-storage 워게임 도전","MIME 타입 / 확장자 필터 우회 정리"],algo:["Lv.2 자유 1문제"]},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"File Vulnerability-2",hack:["Exercise: File Vulnerability-2 풀기","file-download-1 워게임 도전","못 풀면 writeup 분석 → 직접 재현"],algo:["Lv.2 자유 1문제"]},
+{type:"review",title:"7주차 복습",items:["Command Injection + File Vulnerability 페이로드 정리","image-storage / file-download-1 재풀이","Lv.2 틀린 문제 재풀이"]},
+{type:"rest"},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"SQL Injection — 개념 1",hack:["Background: Relational DBMS 강의","ServerSide: SQL Injection 강의","Quiz: SQL Injection"],algo:["Lv.2 자유 2문제"]},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"SQL Injection — 개념 2",hack:["SQL DML 강의","SQL Features 강의 (Subquery/Blind/Union)","Quiz: SQL DML + Features"],algo:["Lv.2 자유 1문제"]},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"SQL Injection — 실습",hack:["Exercise: SQL Injection 풀기","Exercise: Blind SQL Injection 풀기","simple_sqli 워게임 도전"],algo:["Lv.2 자유 2문제"]},
+{path:"Web Hacking Basics (Starter)",type:"hack",title:"NoSQL Injection",hack:["Background: Non-Relational DBMS 강의","ServerSide: NoSQL Injection 강의","Exercise: NoSQL Injection → Mango 워게임"],algo:["Lv.2 자유 1문제"]},
+{path:"Web Hacking Basics",type:"hack",title:"웹해킹 전체 복습 1",hack:["XSS / CSRF / SSRF 페이로드 치트시트 완성","풀이 노트 취약점별로 정리","못 푼 워게임 목록 작성"],algo:["Lv.2 자유 1문제"]},
+{type:"review",title:"8주차 복습",items:["SQLi / NoSQLi 페이로드 정리","simple_sqli / Mango 재풀이","Lv.2 누적 틀린 문제 재풀이"]},
+{type:"rest"},
+{path:"Web Hacking Basics",type:"hack",title:"웹해킹 전체 복습 2",hack:["Command Injection + File Vulnerability 재정리","각 취약점별 방어 방법 정리","writeup 블로그 정리 시작"],algo:["Lv.2 자유 1문제"]},
+{path:"Web Hacking Basics",type:"hack",title:"웹해킹 전체 복습 3",hack:["드림핵 워게임 못 푼 문제 재도전","취약점 공격 흐름도 한 장 요약","2학기 이어서 할 내용 목록 작성"],algo:["Lv.2 자유 2문제"]},
+{path:"webhacking.kr",type:"hack",title:"CTF 입문 — webhacking.kr",hack:["webhacking.kr 가입","old-01 ~ old-03 도전","CTF vs 워게임 차이 정리"],algo:["Lv.2 자유 1문제"]},
+{path:"webhacking.kr",type:"hack",title:"CTF 실전",hack:["old-04 ~ old-06 도전","막히면 힌트만 보고 직접 풀기","풀이 과정 노트 기록"],algo:["Lv.2 자유 1문제"]},
+{path:"webhacking.kr",type:"hack",title:"CTF 계속",hack:["old-07 ~ old-10 도전","못 푼 문제 writeup 분석 → 재현","CTF 패턴 정리"],algo:["Lv.2 자유 1문제"]},
+{type:"review",title:"9주차 복습",items:["CTF 풀이 노트 정리","writeup 3개 이상 작성","Lv.2 틀린 문제 재풀이"]},
+{type:"rest"},
+{type:"rest",title:"광복절"},
+{path:"마무리",type:"hack",title:"포트폴리오 정리",hack:["방학 동안 푼 워게임 목록 스크린샷","writeup 공개 여부 결정 + 업로드","취약점 치트시트 최종 완성"],algo:["Lv.2 자유 1문제"]},
+{path:"마무리",type:"hack",title:"방어 코드 공부",hack:["XSS / SQLi / CSRF 방어 코드 Python으로 작성","OWASP Top 10 목록 훑어보기","보완할 부분 목록 작성"],algo:["Lv.2 자유 1문제"]},
+{path:"마무리",type:"hack",title:"드림핵 Lv.2~3 도전",hack:["드림핵 웹해킹 Lv.2 미풀 문제 도전","Lv.3 문제 1개 시도","막히면 writeup 분석"],algo:["Lv.2 자유 1문제"]},
+{path:"마무리",type:"hack",title:"2학기 계획 수립",hack:["드림핵 풀이 완료 문제 수 최종 체크","2학기 중 이어서 할 주제 목록","솔브드 동아리 연계 계획"],algo:["Lv.2 최종 점검"]},
+{type:"review",title:"10주차 복습",items:["전체 취약점 치트시트 최종 확인","미완성 writeup 마무리","Lv.2 최종 약점 재풀이"]},
+{type:"rest"},
+{path:"마무리",type:"hack",title:"최종 복습 1 — 클라이언트 사이드",hack:["XSS / CSRF / XSS Filtering Bypass 한 페이지 요약","관련 워게임 재풀이","개학 후 공부 계획 확정"],algo:["자유 도전"]},
+{path:"마무리",type:"hack",title:"최종 복습 2 — 서버 사이드",hack:["SSRF / Command Injection / File Vulnerability / SQLi 한 페이지 요약","관련 워게임 재풀이","못 푼 문제 마지막 도전"],algo:["자유 도전"]},
+{path:"마무리",type:"hack",title:"최종 정리",hack:["방학 회고 작성","드림핵 총 푼 문제 수 집계","블로그/노션 최종 업데이트"],algo:["자유 도전"]},
+{path:"마무리",type:"hack",title:"개학 전날",hack:["가볍게 관심 문제 자유 도전","2학기 준비 완료","일찍 자기"],algo:["자유"]},
+{type:"rest",title:"개학 D-1"},
+{type:"review",title:"방학 마무리",items:["전체 커리큘럼 체크리스트 점검","writeup 최종 정리","Programmers 방학 총 풀이 수 집계"]},
+{type:"rest"},
+];
+
+function makeItemId(planIdx,kind,i){return `p${planIdx}_${kind}_${i}`;}
+function getPlanItemIds(planIdx){
+  const p=PLAN[planIdx];if(!p)return[];
+  const ids=[];
+  if(p.type==='rest'||p.type==='review'){(p.items||[]).forEach((_,i)=>ids.push(makeItemId(planIdx,'item',i)));}
+  else{(p.hack||[]).forEach((_,i)=>ids.push(makeItemId(planIdx,'hack',i)));(p.algo||[]).forEach((_,i)=>ids.push(makeItemId(planIdx,'algo',i)));}
+  return ids;
+}
+function getItemText(id){
+  const m=id.match(/^p(\d+)_(\w+)_(\d+)$/);if(!m)return'';
+  const[,pi,kind,i]=[...m];const p=PLAN[parseInt(pi)];if(!p)return'';
+  if(kind==='item')return(p.items||[])[parseInt(i)]||'';
+  if(kind==='hack')return(p.hack||[])[parseInt(i)]||'';
+  if(kind==='algo')return(p.algo||[])[parseInt(i)]||'';
+  return'';
+}
+
+// saveAll은 Firebase 모듈에서 window.saveAll로 등록됨
+// 로딩 전 fallback
+if(!window.saveAll) window.saveAll=function(){
+  try{
+    localStorage.setItem('dh_checked',JSON.stringify(window.checked||{}));
+    localStorage.setItem('dh_moved',JSON.stringify(window.moved||{}));
+    localStorage.setItem('dh_doubles',JSON.stringify(window.doubles||{}));
+    localStorage.setItem('dh_restopts',JSON.stringify(window.restOpts||{}));
+  }catch(e){}
+};
+
+const STUDY_INDICES=PLAN.reduce((arr,p,i)=>{if(p.type!=='rest'&&p.type!=='review')arr.push(i);return arr;},[]);
+function isOriginallyRest(dateIdx){if(dateIdx<0||dateIdx>=PLAN.length)return false;return PLAN[dateIdx].type==='rest'||PLAN[dateIdx].type==='review';}
+
+function getBasePlanIdx(dateIdx){
+  let planIdx=dateIdx;
+  const pullEntries=Object.entries(window.doubles||{}).filter(([k])=>parseInt(k)<dateIdx).sort((a,b)=>parseInt(a[0])-parseInt(b[0]));
+  for(const[k,v]of pullEntries){
+    const opt=(window.restOpts||{})[k]||'include';
+    if(opt==='include'){planIdx+=v;}
+    else{const curPos=STUDY_INDICES.indexOf(planIdx);if(curPos!==-1){const newPos=Math.min(curPos+v,STUDY_INDICES.length-1);planIdx=STUDY_INDICES[newPos];}}
+  }
+  return planIdx;
+}
+
+function getPlansForDate(y,m,d){
+  const dt=new Date(y,m,d);if(dt<S||dt>E)return null;
+  const dateIdx=Math.round((dt-S)/86400000);
+  const basePlanIdx=getBasePlanIdx(dateIdx);
+  const extra=(window.doubles||{})[String(dateIdx)]||0;
+  const thisOpt=(window.restOpts||{})[String(dateIdx)]||'include';
+  const hasPriorPull=Object.keys(window.doubles||{}).some(k=>parseInt(k)<dateIdx);
+  if(hasPriorPull&&isOriginallyRest(dateIdx)){
+    const recentOpt=Object.entries(window.doubles||{}).filter(([k])=>parseInt(k)<dateIdx).sort((a,b)=>parseInt(b[0])-parseInt(a[0]))[0];
+    if(recentOpt&&((window.restOpts||{})[recentOpt[0]]||'include')==='skip'){
+      return{plans:[PLAN[dateIdx]],dateIdx,extra:0,planIdx:dateIdx,locked:true};
+    }
+  }
+  const plans=[];if(basePlanIdx<PLAN.length)plans.push(PLAN[basePlanIdx]);
+  let nextIdx=basePlanIdx;
+  for(let i=0;i<extra;i++){
+    if(thisOpt==='skip'){const curPos=STUDY_INDICES.indexOf(nextIdx);if(curPos!==-1&&curPos+1<STUDY_INDICES.length){nextIdx=STUDY_INDICES[curPos+1];}else{nextIdx++;}}
+    else{nextIdx++;}
+    if(nextIdx<PLAN.length)plans.push(PLAN[nextIdx]);
+  }
+  return{plans,dateIdx,extra,planIdx:basePlanIdx};
+}
+
+function getItemsForDate(dateIdx){
+  const res=getPlansForDate(...dateIdxToYMD(dateIdx));
+  if(!res)return{own:[],incoming:[]};
+  const own=[];
+  res.plans.forEach(p=>{
+    const pi=PLAN.indexOf(p);
+    getPlanItemIds(pi).forEach(id=>{
+      if((window.moved||{})[id]!==undefined&&(window.moved||{})[id]!==dateIdx)return;
+      own.push({id,text:getItemText(id),kind:id.includes('_algo_')?'algo':'hack'});
+    });
+  });
+  const incoming=[];
+  for(const[id,targetIdx]of Object.entries(window.moved||{})){
+    if(targetIdx===dateIdx){incoming.push({id,text:getItemText(id),kind:id.includes('_algo_')?'algo':'hack'});}
+  }
+  return{own,incoming};
+}
+
+function dateIdxToYMD(idx){const dt=new Date(S.getTime()+idx*86400000);return[dt.getFullYear(),dt.getMonth(),dt.getDate()];}
+function dateToIdx(y,m,d){return Math.round((new Date(y,m,d)-S)/86400000);}
+
+const MN=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const DN=['일','월','화','수','목','금','토'];
+window.cY=2026;window.cM=5;
+let modalDateIdx=null;
+let selectedRestOpt=null;
+
+function tagClass(p){
+  if(!p)return'';
+  if(p.type==='rest')return't-rest';
+  if(p.type==='review')return't-review';
+  if(p.type==='linux')return't-linux';
+  if(p.type==='web')return't-web';
+  return't-hack';
+}
+
+function getDateProgress(dateIdx){
+  const items=getItemsForDate(dateIdx);
+  const all=[...items.own,...items.incoming];
+  if(all.length===0)return null;
+  const done=all.filter(it=>(window.checked||{})[it.id]).length;
+  return{done,total:all.length};
+}
+
+function render(y,m){
+  window.cY=y;window.cM=m;
+  document.getElementById('mtitle').textContent=`${y}년 ${MN[m]}`;
+  const first=new Date(y,m,1).getDay();
+  const total=new Date(y,m+1,0).getDate();
+  let html='';let d=1-first;
+  while(d<=total){
+    html+='<div class="wrow">';
+    for(let dow=0;dow<7;dow++){
+      if(d<1||d>total){html+='<div class="dc empty"></div>';}
+      else{
+        const res=getPlansForDate(y,m,d);
+        const p=res&&res.plans.length>0?res.plans[0]:null;
+        const isDoubled=res&&res.extra>0;
+        const dt2=new Date(y,m,d);
+        const isT=dt2.toDateString()===TODAY.toDateString();
+        const numCls='dn'+(dow===0?' sun':dow===6?' sat':'')+(isT?' td':'');
+        let cellCls='dc'+(isT?' today':'')+(p?'':' noplan')+(isDoubled?' doubled':'');
+        let tags='';
+        let badge=isDoubled?`<span class="double-badge">×${res.extra+1}</span>`:'';
+        let progressHtml='';
+        if(p&&p.type!=='rest'){
+          const dateIdx=Math.round((new Date(y,m,d)-S)/86400000);
+          const prog=getDateProgress(dateIdx);
+          if(prog&&prog.total>0){
+            const pct=Math.round(prog.done/prog.total*100);
+            progressHtml=`<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>`;
+          }
+        }
+        if(p){
+          const tc=tagClass(p);
+          if(p.type==='rest'){tags=`<span class="tag t-rest">${p.title||'휴식'}</span>`;}
+          else if(p.type==='review'){tags=`<span class="tag t-review">복습</span><span class="tag t-algo">알고리즘</span>`;}
+          else{const sh=p.title.length>11?p.title.slice(0,11)+'…':p.title;tags=`<span class="tag ${tc}">${sh}</span><span class="tag t-algo">Programmers</span>`;}
+        }
+        const cl=p?`onclick="openModal(${y},${m},${d})"`:' ';
+        html+=`<div class="${cellCls}" ${cl}><div class="${numCls}">${d}</div>${tags}${progressHtml}${badge}</div>`;
+      }
+      d++;
+    }
+    html+='</div>';
+    if(d>total)break;
+  }
+  document.getElementById('grid').innerHTML=html;
+}
+
+function openModal(y,m,d){
+  const res=getPlansForDate(y,m,d);
+  if(!res||res.plans.length===0)return;
+  modalDateIdx=dateToIdx(y,m,d);
+  const dow=new Date(y,m,d).getDay();
+  document.getElementById('m-meta').textContent=`${y}년 ${MN[m]} ${d}일 (${DN[dow]})`;
+  document.getElementById('m-title').textContent=res.plans[0].title+(res.extra>0?` +${res.extra}일치`:'');
+  document.getElementById('m-path').textContent=res.plans[0].path||'';
+  document.getElementById('pull-panel').classList.remove('open');
+  selectedRestOpt=null;
+  renderModalBody();
+  document.getElementById('mbg').classList.add('open');
+}
+
+function renderModalBody(){
+  const res=getPlansForDate(...dateIdxToYMD(modalDateIdx));
+  if(!res)return;
+  const items=getItemsForDate(modalDateIdx);
+  let html='';
+  const p=res.plans[0];
+  const isRestDay=p.type==='rest'||p.type==='review';
+  if(isRestDay){
+    html+=`<div class="sec-label">오늘은</div>`;
+    (p.items||['완전히 쉬기']).forEach((txt,i)=>{
+      const id=makeItemId(PLAN.indexOf(p),'item',i);
+      html+=renderItem(id,txt,'t-rest',false,false);
+    });
+  }else{
+    const hackItems=items.own.filter(it=>!it.id.includes('_algo_'));
+    const algoItems=items.own.filter(it=>it.id.includes('_algo_'));
+    const incomingHack=items.incoming.filter(it=>!it.id.includes('_algo_'));
+    const incomingAlgo=items.incoming.filter(it=>it.id.includes('_algo_'));
+    const hackDone=hackItems.filter(it=>(window.checked||{})[it.id]).length+incomingHack.filter(it=>(window.checked||{})[it.id]).length;
+    const hackTotal=hackItems.length+incomingHack.length;
+    const algoDone=algoItems.filter(it=>(window.checked||{})[it.id]).length+incomingAlgo.filter(it=>(window.checked||{})[it.id]).length;
+    const algoTotal=algoItems.length+incomingAlgo.length;
+    html+=`<div class="sec-label">해킹 <span class="sec-progress">${hackDone}/${hackTotal}</span></div>`;
+    hackItems.forEach(it=>{html+=renderItem(it.id,it.text,tagClass(p),true,true);});
+    incomingHack.forEach(it=>{html+=renderItem(it.id,it.text,tagClass(p),true,false,true);});
+    html+=`<div class="sec-label">알고리즘 <span class="sec-progress">${algoDone}/${algoTotal}</span></div>`;
+    algoItems.forEach(it=>{html+=renderItem(it.id,it.text,'t-algo',true,true);});
+    incomingAlgo.forEach(it=>{html+=renderItem(it.id,it.text,'t-algo',true,false,true);});
+  }
+  document.getElementById('m-body').innerHTML=html;
+  let btns=`<button class="m-close" onclick="closeModal()">닫기</button>`;
+  if(!isRestDay){
+    btns+=`<button class="double-btn" onclick="showDayPullPanel()">⚡ 하루치 더 당기기</button>`;
+    if(res.extra>0)btns+=`<button class="m-close" style="background:var(--bg2)" onclick="undoDouble()">↩ 되돌리기</button>`;
+  }
+  document.getElementById('m-btns').innerHTML=btns;
+}
+
+function renderItem(id,text,colorClass,canAct,canPush,isIncoming=false){
+  const isDone=(window.checked||{})[id]||false;
+  const isMoved=(window.moved||{})[id]!==undefined&&!isIncoming;
+  let cls='cl-item'+(isDone?' done':'')+(isMoved?' moved-away':'')+(isIncoming?' incoming':'');
+  let actions='';
+  if(canAct){
+    if(isIncoming||isMoved){actions+=`<button class="cl-btn restore" onclick="restoreItem('${id}')">↩</button>`;}
+    else{
+      if(canPush)actions+=`<button class="cl-btn push" onclick="pushItem('${id}')">→내일</button>`;
+      actions+=`<button class="cl-btn pull" onclick="pullItem('${id}')">←당기기</button>`;
+    }
+  }
+  const incomingLabel=isIncoming?`<div class="incoming-label">↙ 다른 날에서 당겨옴</div>`:'';
+  return`<div class="${cls}" id="item_${id}">
+    <div class="cl-check${isDone?' checked':''}" onclick="toggleCheck('${id}')">${isDone?'✓':''}</div>
+    <div style="flex:1"><div class="cl-text">${text}</div>${incomingLabel}</div>
+    <div class="cl-actions">${actions}</div>
+  </div>`;
+}
+
+function toggleCheck(id){
+  if(!window.checked)window.checked={};
+  window.checked[id]=!window.checked[id];
+  window.saveAll();renderModalBody();render(window.cY,window.cM);
+}
+function pushItem(id){
+  if(!window.moved)window.moved={};
+  window.moved[id]=modalDateIdx+1;
+  window.saveAll();renderModalBody();render(window.cY,window.cM);
+}
+function pullItem(id){
+  if(!window.moved)window.moved={};
+  window.moved[id]=modalDateIdx;
+  window.saveAll();renderModalBody();render(window.cY,window.cM);
+}
+function restoreItem(id){
+  if(window.moved)delete window.moved[id];
+  window.saveAll();renderModalBody();render(window.cY,window.cM);
+}
+function showDayPullPanel(){
+  selectedRestOpt=null;
+  document.getElementById('opt-include').classList.remove('selected');
+  document.getElementById('opt-skip').classList.remove('selected');
+  document.getElementById('pull-confirm').disabled=true;
+  document.getElementById('pull-panel').classList.add('open');
+}
+function selectRestOpt(opt){
+  selectedRestOpt=opt;
+  document.getElementById('opt-include').classList.toggle('selected',opt==='include');
+  document.getElementById('opt-skip').classList.toggle('selected',opt==='skip');
+  document.getElementById('pull-confirm').disabled=false;
+}
+function confirmDayPull(){
+  if(!selectedRestOpt)return;
+  const k=String(modalDateIdx);
+  if(!window.doubles)window.doubles={};
+  if(!window.restOpts)window.restOpts={};
+  window.doubles[k]=(window.doubles[k]||0)+1;
+  window.restOpts[k]=selectedRestOpt;
+  window.saveAll();
+  document.getElementById('pull-panel').classList.remove('open');
+  closeModal();render(window.cY,window.cM);
+}
+function undoDouble(){
+  const k=String(modalDateIdx);
+  if(window.doubles&&window.doubles[k]>0){window.doubles[k]--;if(window.doubles[k]===0)delete window.doubles[k];}
+  window.saveAll();closeModal();render(window.cY,window.cM);
+}
+function closeIf(e){if(e.target===document.getElementById('mbg'))closeModal();}
+function closeModal(){document.getElementById('mbg').classList.remove('open');}
+function prev(){let m=window.cM-1,y=window.cY;if(m<0){m=11;y--;}render(y,m);}
+function next(){let m=window.cM+1,y=window.cY;if(m>11){m=0;y++;}render(y,m);}
+render(window.cY,window.cM);
+</script>
+</body>
+</html>
